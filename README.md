@@ -34,4 +34,4 @@ As lightweight Python 3 graphing API for genomic intervals and genomic features.
 >>> fig, axes = g.draw()
 ```
 
-![test_interval](https://raw.githubusercontent.com/clintval/varsig/master/img/gb_test.png "Test Interval")
+![test_interval](https://raw.githubusercontent.com/clintval/genome-browser/master/img/gb_test.png "Test Interval")
