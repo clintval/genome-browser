@@ -1,15 +1,17 @@
 Genome Diagram
 ---
 
+As lightweight Python 3 graphing API for genomic intervals and genomic features.
+
 ```python
 >>> import numpy as np
->>> from varsig import genome_diagram as gd
+>>> import genome_browser as gb
 >>> n = 105  # Length of randoim genomic interval.
 
->>> g = gd.GenomeDiagram()
+>>> g = gb.GenomeDiagram()
 
 # Plot a density of random data, interpolated and filled.
->>> track1 = gd.Graph('Random Density')
+>>> track1 = gb.Graph('Random Density')
 >>> track1.new_graph(x=np.arange(n),
 >>>                  y=np.abs(np.random.randn(n)),
 >>>                  fmt='interpolate',
@@ -17,7 +19,7 @@ Genome Diagram
 >>> g.add_track(track1)
 
 # Plot 9 random interval features (random start, length, orientation, and color).
->>> track = gd.Feature('Random Intervals', height_ratio=0.4)
+>>> track = gb.Feature('Random Intervals', height_ratio=0.4)
 >>> for _ in range(9):
 >>>     # Feature must follow iterable as (position, width, strand, color)
 >>>     track.add_feature([np.random.randint(0, n -15),
@@ -32,4 +34,4 @@ Genome Diagram
 >>> fig, axes = g.draw()
 ```
 
-![test_interval](https://raw.githubusercontent.com/clintval/varsig/master/img/gd_test.png "Test Interval")
+![test_interval](https://raw.githubusercontent.com/clintval/varsig/master/img/gb_test.png "Test Interval")
