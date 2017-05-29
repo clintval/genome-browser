@@ -57,6 +57,12 @@ def ticklabels_to_percent(ax, axis='y'):
     return ax
 
 
+def ticklabels_to_thousands_sep(ax, axis='y'):
+    getattr(ax, '{}axis'.format(axis)).set_major_formatter(
+        mticker.FuncFormatter(lambda s, position: '{:,}'.format(int(s))))
+    return ax
+
+
 def disjoint_bins(intervals):
     bins = collections.defaultdict(list)
 
@@ -92,7 +98,6 @@ class GenomeDiagram(object):
     def __init__(self, name=None):
         self.annotation = None
         self.name = name
-        self.step = 500
         self.tracks = []
 
     @property
@@ -127,7 +132,7 @@ class GenomeDiagram(object):
 
         # If this figure has a name, make it the title.
         if self.name is not None:
-            fig.suptitle(self.name, x=0.5, y=0.92, fontsize=24)
+            fig.suptitle(self.name, x=0.5, y=0.94, fontsize=24)
 
         # If we are only plotting one track then put it in an iterable for zip.
         if len(self.tracks) == 1:
@@ -151,11 +156,11 @@ class GenomeDiagram(object):
             else:
                 ax.spines['bottom'].set_visible(True)
                 # Set the positions every step size after the 0-defined min.
-                ax.set_xticks(range(*map(int, ax.get_xlim()), self.step))
+                ax.set_xticks(range(*map(int, ax.get_xlim()), track.step))
                 # Set the labels as numbers increasing by step, after 0.
                 ax.set_xticklabels(
                     range(0, int(abs(np.subtract(*ax.get_xlim()))),
-                          self.step))
+                          track.step))
                 # Figure annotations will be applied to the last ax in offset
                 # coordinates in a lightgray text. Clipping is ignored as the
                 # text clearly cips with the axes outboard frame.
@@ -167,19 +172,8 @@ class GenomeDiagram(object):
                                 textcoords='offset points',
                                 va='bottom',
                                 ha='right',
-                                color='0.5',
+                                color='0.6',
                                 clip_on=False)
-
-            if track.ylabel is not None:
-                x = self.xlim[0] - 0.01 * (self.xlim[1] - self.xlim[0])
-                y = ax.get_ylim()[1] * 0.30
-
-                ax.annotate(track.ylabel,
-                            xy=(x, y),
-                            va='center',
-                            ha='right',
-                            annotation_clip=False,
-                            color='0.1')
 
             # Provide simple logic for plotting a track annotation in the
             # top left of each track. The position will remain constant as its
@@ -199,17 +193,16 @@ class Track(object):
         self.annotate = True
         self.height_ratio = height_ratio
         self.name = name
-        self.ylabel = None
+        self.step = 500
 
     def highlight_interval(self):
         ...
 
 
 class Feature(Track):
-    def __init__(self, name=None, height_ratio=1, min_levels=1):
+    def __init__(self, name=None, height_ratio=1):
         Track.__init__(self, name, height_ratio=height_ratio)
         self.features = []
-        self.min_levels = min_levels
         self.pullback = 1
 
     @property
@@ -245,14 +238,14 @@ class Feature(Track):
 
         # The non-overlapping disjoint intervals are computed using the
         # logic which priortizes first position of interval, then length.
-        tiers = list(disjoint_bins(self._intervals))
+        levels = list(disjoint_bins(self._intervals))
 
         # pull_back is the distance in units to pull back corners for
-        # directional intervals.
+        # directional intervals
         pull_back = self.pullback * 0.005 * abs(np.subtract(*self.xlim))
 
-        for (position, width, strand, color), tier in zip(
-                self._sorted_features, tiers):
+        for (position, width, strand, color), level in zip(
+                self._sorted_features, levels):
 
             # pull_back is used on either the start or end of the interval
             # depending on the strand, if the pull_back is greater than the
@@ -265,22 +258,21 @@ class Feature(Track):
             # The four corners can be 'pulled back' (either left or right) to
             # simulate a directional rectangle.
             ax.add_patch(patches.Polygon(
-                [[position + start_taper, tier],                 # left bottom
-                 [position, tier + height / 2],                  # left center
-                 [position + start_taper, tier + height],        # left top
+                [[position + start_taper, level],
+                 [position, level + height / 2],
+                 [position + start_taper, level + height],
 
-                 [position + width - end_taper, tier + height],  # right top
-                 [position + width, tier + height / 2],          # right center
-                 [position + width - end_taper, tier]],          # right bottom
+                 [position + width - end_taper, level + height],
+                 [position + width, level + height / 2],
+                 [position + width - end_taper, level]],
                 lw=0, closed=True, color=color, alpha=ALPHA))
 
         # For features, remove y-axis by default.
         ax = despine(ax_off(ax, axis='y'))
 
-        # Adjust y-limits that scales with the number of tiers.
-        ax.set_ylim(-1, max(self.min_levels + 1, max(tiers) + 1))
+        # Adjust y-limits to include padding, scales with the number of levels.
+        ax.set_ylim((0 - PADDING) * (max(levels) + 1) / 2, max(levels) + 1)
         ax.set_xlim(*self.xlim)
-
         return ax
 
 
@@ -292,10 +284,12 @@ class Graph(Track):
 
     @property
     def xlim(self):
-        series, *_ = zip(*self._graphs)
-        return min(flatten(series)), max(flatten(series))
+        independents, *_ = zip(*self._graphs)
+        flat = list(chain.from_iterable(
+                    [x for x in independents]))
+        return min(flat), max(flat)
 
-    def new_graph(self, x, y, color='0.1', alpha=1, fmt='line',
+    def new_graph(self, x, y, color='0.1', alpha=1, fmt='interpolate',
                   fill=False):
         self._empty = False
         self._graphs.append((x, y, color, fmt, fill, alpha))
@@ -308,12 +302,7 @@ class Graph(Track):
         # This ensure that each graph neatly overlays over the last and is not
         # stacked in the same z-layer.
         for i, (x, y, color, fmt, fill, alpha) in enumerate(self._graphs):
-            if fmt == 'line':
-                ax.plot(x, y, color=color, alpha=alpha, zorder=2.7 + i)
-            elif fmt == 'bar':
-                ax.bar(x, y, color=color, alpha=alpha, zorder=2.7 + i)
-
-            elif fmt == 'interpolate':
+            if fmt == 'interpolate':
                 x_new = np.linspace(min(x), max(x), RESOLUTION)
                 x, y = x_new, interpolate(x, y)(x_new)
 
@@ -329,6 +318,11 @@ class Graph(Track):
                     antialiased=True,
                     alpha=alpha,
                     zorder=2.7 + i)
+            else:
+                ax.plot(x, y, color=color, alpha=alpha, zorder=2.7 + i)
+
+        if max(ax.get_ylim()) > 999:
+            ax = ticklabels_to_thousands_sep(ax, 'y')
 
         # If this is proportional data then convert y-axis to percents.
         if self.is_proportional is True:
