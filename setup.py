@@ -8,5 +8,6 @@ setup(
     author_email='valentine.clint@gmail.com',
     url='https://github.com/clintval/genome-browser',
     install_requires=[
+        'requests',
     ],
     packages=find_packages())

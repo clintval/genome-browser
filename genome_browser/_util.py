@@ -1,5 +1,7 @@
 import collections
 
+from tempfile import NamedTemporaryFile
+
 import matplotlib.ticker as mticker
 import numpy as np
 
@@ -53,6 +55,13 @@ def disjoint_bins(intervals):
         bins[level].append(sites)
 
         yield level
+
+
+def string_as_temporary_file(string):
+    handle = NamedTemporaryFile(mode='w+', delete=False)
+    handle.write(string)
+    handle.close()
+    return handle
 
 
 def ticklabels_to_percent(ax, axis='y'):

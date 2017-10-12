@@ -1,3 +1,4 @@
+from genome_browser._gene_locus import *
 from genome_browser._genome_diagram import *
 from genome_browser._tracks import *
 from genome_browser._units import *
