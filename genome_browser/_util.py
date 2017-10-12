@@ -1,5 +1,4 @@
-import collections
-
+from collections import defaultdict
 from tempfile import NamedTemporaryFile
 
 import matplotlib.ticker as mticker
@@ -21,29 +20,49 @@ def impute_zeros(x, y):
     return imputed_y.tolist()
 
 
-def despine(ax):
-    for spine in ['top', 'left', 'bottom', 'right']:
-        ax.spines[spine].set_visible(False)
+def despine(ax, top=True, left=True, bottom=True, right=True):
+    for spine, on in zip(
+        ('top', 'left', 'bottom', 'right'), (top, left, bottom, right)
+    ):
+        ax.spines[spine].set_visible(not on)
     return ax
 
 
 def disjoint_bins(intervals):
-    bins = collections.defaultdict(list)
+    """Given an interable of interval features provide the most efficient
+    vertical packing of them such that none overlap. Horizontal packing is
+    determined solely by the order in which they are presented. For instance,
+    an iterable sorted by length will prioritize placing long intervals at
+    lower levels. Returned are the levels each interval must exist on to ensure
+    there are no overlaps.
+
+    Parameters
+    ----------
+    intervals : iterable
+        Can be a list of (float, float) tuples or a list of interval classes
+        with 'start' and 'stop' attributes such as a BedTool interval or a VCF
+        Record class. Tuple-style intervals and class intervals can be mixed.
+
+    Returns
+    -------
+    levels : generator
+        The levels corresponding to each interval in `iterable` such that none
+        overlap.
+
+    """
+    bins = defaultdict(list)
 
     for interval in intervals:
-
-        if isinstance(interval, type(interval)):  ###TODO
+        if hasattr(interval, 'start') and hasattr(interval, 'end'):
             start, end = interval.start, interval.end
-        elif isinstance(interval, tuple):
-            start, end = interval
         else:
-            raise ValueError(f'Interval {repr(interval)} not of class Interval or tuple')
+            start, end = interval
+
+        loci = set(range(start, end + 1))
 
         level = None
-        sites = set(range(start, end + 1))
-
         for bin, features in sorted(bins.items()):
-            if not any([sites.intersection(f) for f in features]):
+            if not any((loci.intersection(feature) for feature in features)):
                 level = bin
                 break
 
@@ -51,8 +70,7 @@ def disjoint_bins(intervals):
             level = 0
         elif level is None:
             level = max(bins) + 1
-
-        bins[level].append(sites)
+        bins[level].append(loci)
 
         yield level
 

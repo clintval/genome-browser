@@ -2,14 +2,50 @@ import csv
 import json
 import requests
 
-from genome_browser._util import string_as_temporary_file
+import matplotlib.pyplot as plt
+
+from matplotlib.patches import Rectangle, Shadow
+from palettable.cartocolors.qualitative import Prism_10
+# from palettable.colorbrewer.qualitative import Paired_12
+
+from genome_browser._util import ax_off, despine, string_as_temporary_file
 
 __all__ = [
     'get_uniprot_id_from_gene_symbol',
     'get_pfam_entry_from_uniprot_id',
     'get_pfam_entry_graphic',
-    'get_features_from_uniprot_id']
+    'get_features_from_uniprot_id',
+    'plot_gene_features_from_seq_record']
 
+
+FACECOLOR = '0.978'
+LABEL_SPACE = 5
+TEXT_ZORDER = 20
+SHADOW_PROPS = {'alpha': 0.075, 'color': 'k', 'ec': 'none'}
+
+COLOR_MAP = {
+    'dna binding': Prism_10.hex_colors[-2],
+    'helix': Prism_10.hex_colors[1],
+    'chain': '0.675',
+}
+
+ALPHA_MAP = {
+    'dna binding': 1,
+    'helix': 1,
+    'chain': 1,
+}
+
+ZORDER_MAP = {
+    'dna binding': 7,
+    'helix': 6,
+    'chain': 3,
+}
+
+HEIGHT_PADDING_MAP = {
+    'dna binding': 0.2,
+    'helix': 0,
+    'chain': -0.75,
+}
 
 MOTIF_DEFINITION = {
     'disorder': 'Disordered region (Pfam/IUPred)',
@@ -129,3 +165,72 @@ def get_features_from_uniprot_id(uniprot_id):
         return content
     except ImportError:
         return content
+
+
+def plot_gene_features_from_seq_record(seq_record, ax=None):
+    ax = ax or plt.gca()
+
+    xticks = []
+    x_min, x_max = float('inf'), float('-inf')
+
+    for feature in sorted(
+        seq_record.features,
+        key=lambda _: _.location.end.position,
+        reverse=True
+    ):
+        start = feature.location.start.position
+        end = feature.location.end.position
+
+        x_min, x_max = min(start, x_min), max(end, x_max)
+
+        color = COLOR_MAP.get(feature.type.lower(), '0.7')
+        zorder = ZORDER_MAP.get(feature.type.lower(), 1)
+        alpha = ALPHA_MAP.get(feature.type.lower(), 1)
+        height_padding = HEIGHT_PADDING_MAP.get(feature.type.lower(), 0)
+
+        rectangle = Rectangle(
+            xy=(start, -0.5 - (height_padding / 2)),
+            width=end - start,
+            height=1 + height_padding,
+            color=color,
+            zorder=zorder,
+            alpha=alpha)
+        ax.add_patch(rectangle)
+
+        shadow = Shadow(
+            rectangle,
+            ox=0.06,
+            oy=-0.007,
+            props=SHADOW_PROPS)
+        shadow.set_zorder(1)
+
+        # Add shadows to all features except chains.
+        if feature.type.lower() != 'chain':
+            ax.add_patch(shadow)
+
+        # Add tick marks. Starts are guaranteed, ends only appear if they are
+        # not within LABEL_SPACE of another start.
+        if feature.type.lower() in ('helix', 'chain'):
+            if len(xticks) != 0 and xticks[-1] - end < LABEL_SPACE:
+                xticks.append(start)
+            else:
+                xticks.extend((end, start))
+
+        if feature.type.lower() == 'dna binding':
+            ax.annotate(
+                s=feature.type,
+                xy=(start + (end - start) / 2, 0),
+                color='w',
+                ha='center',
+                va='center',
+                fontsize=14,
+                zorder=TEXT_ZORDER)
+
+    ax.set_xticks(sorted(set(xticks)))
+    ax.set_xticklabels(sorted(set(xticks)), fontsize=9)
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(-0.75, 0.75)
+
+    despine(ax_off(ax, 'y'), bottom=False)
+
+    return ax
