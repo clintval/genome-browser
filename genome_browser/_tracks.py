@@ -2,7 +2,12 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-from genome_browser._util import (ax_off, despine, disjoint_bins, ticklabels_to_percent, ticklabels_to_thousands_sep)
+from genome_browser._util import (
+    ax_off,
+    despine,
+    disjoint_bins,
+    ticklabels_to_percent,
+    ticklabels_to_thousands_sep)
 
 __all__ = [
     'GraphTrack',
@@ -110,14 +115,18 @@ class IntervalTrack(Track):
 
     @property
     def interval_pretty_sort(self):
-        """Function to sort the intervals by three attributes in priority order of start position,
-        length, and strand orientation. First intervals are sorted by in ascending order by how soon
-        they appear in the figure. Then, intervals are sorted in descending order with regard to their
-        length. This ensures longer left-aligning intervals will appear earlier and lower on the stacking
-        diagram. Finally strandness is sorted for to help keep order beyond placements.
+        """Function to sort the intervals by three attributes in priority order
+        of start position, length, and strand orientation. First intervals are
+        sorted by in ascending order by how soon they appear in the figure.
+        Then, intervals are sorted in descending order with regard to their
+        length. This ensures longer left-aligning intervals will appear earlier
+        and lower on the stacking diagram. Finally strandness is sorted for to
+        help keep order beyond placements.
 
         """
-        return sorted(self.intervals, key=lambda _: (_.start, -len(_), _.strand))
+        return sorted(
+            self.intervals,
+            key=lambda _: (_.start, -len(_), _.strand))
 
     @property
     def is_empty(self):
@@ -184,7 +193,9 @@ class IntervalTrack(Track):
         ax = despine(ax_off(ax, axis='y'))
 
         # Adjust y-limits to include padding, scales with the number of levels.
-        ax.set_ylim((0 - self.PADDING) * (max(levels) + 1) / 2, max(levels) + 1)
+        ax.set_ylim(
+            (0 - self.PADDING) * (max(levels) + 1) / 2,
+            max(levels) + 1)
         ax.set_xlim(*self.xlimits)
 
         return ax

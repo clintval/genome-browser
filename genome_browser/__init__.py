@@ -8,7 +8,6 @@ STRANDS = {'.', '+', '-'}
 PALETTE = {
     'gene': '#00A388',
     'misc_recomb': '#FF4A32',
-    'repl_origin': '#97D54C',
-}
+    'repl_origin': '#97D54C'}
 
 TEST_COLORS = ['#E74C3C', '#3498DB', '0.2']
