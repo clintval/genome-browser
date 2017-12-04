@@ -14,7 +14,7 @@ __all__ = [
     'get_uniprot_id_from_gene_symbol',
     'get_pfam_entry_from_uniprot_id',
     'get_pfam_entry_graphic',
-    'get_features_from_uniprot_id',
+    'gff_records_from_uniprot_id',
     'plot_gene_features_from_seq_record']
 
 
@@ -25,6 +25,7 @@ SHADOW_PROPS = {'alpha': 0.075, 'color': 'k', 'ec': 'none'}
 
 COLOR_MAP = {
     'dna binding': Prism_10.hex_colors[-2],
+    'domain': Prism_10.hex_colors[6],
     'helix': Prism_10.hex_colors[1],
     'chain': '0.675',
 }
@@ -143,7 +144,7 @@ def get_pfam_entry_from_uniprot_id(uniprot_id):
     return entry_name
 
 
-def get_features_from_uniprot_id(uniprot_id):
+def gff_records_from_uniprot_id(uniprot_id):
     url = f'http://www.uniprot.org/uniprot/{uniprot_id}.gff'
 
     with requests.Session() as session:
@@ -178,13 +179,21 @@ def plot_gene_features_from_seq_record(seq_record, ax=None):
         key=lambda _: _.location.end.position,
         reverse=True
     ):
+        if feature.type.lower() not in (
+            'dna binding',
+            'helix',
+            'chain',
+            'domain'
+        ):
+            continue
+
         start = feature.location.start.position
         end = feature.location.end.position
 
         x_min, x_max = min(start, x_min), max(end, x_max)
 
         color = COLOR_MAP.get(feature.type.lower(), '0.7')
-        zorder = ZORDER_MAP.get(feature.type.lower(), 1)
+        zorder = ZORDER_MAP.get(feature.type.lower(), 6)
         alpha = ALPHA_MAP.get(feature.type.lower(), 1)
         height_padding = HEIGHT_PADDING_MAP.get(feature.type.lower(), 0)
 
@@ -216,7 +225,7 @@ def plot_gene_features_from_seq_record(seq_record, ax=None):
             else:
                 xticks.extend((end, start))
 
-        if feature.type.lower() == 'dna binding':
+        if feature.type.lower() in ('dna binding'):
             ax.annotate(
                 s=feature.type,
                 xy=(start + (end - start) / 2, 0),
