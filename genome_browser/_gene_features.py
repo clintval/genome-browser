@@ -19,7 +19,7 @@ __all__ = [
 
 
 FACECOLOR = '0.978'
-LABEL_SPACE = 5
+LABEL_SPACE = 4
 TEXT_ZORDER = 20
 SHADOW_PROPS = {'alpha': 0.075, 'color': 'k', 'ec': 'none'}
 
@@ -82,10 +82,10 @@ class PfamGraphicResponse(object):
     def __init__(self, content):
         self.regions = []
 
-        self.length   = content.get('length', None)
-        self.markups  = content.get('markups', ())
+        self.length = content.get('length', None)
+        self.markups = content.get('markups', ())
         self.metadata = content.get('metadata', {})
-        self.motifs   = content.get('motifs', ())
+        self.motifs = content.get('motifs', ())
 
         for region in content.get('regions', ()):
             self.regions.append(PfamGraphicFeature(region))
@@ -225,18 +225,24 @@ def plot_gene_features_from_seq_record(seq_record, ax=None):
             else:
                 xticks.extend((end, start))
 
-        if feature.type.lower() in ('dna binding'):
+        if feature.type.lower() in ('helix', 'dna binding'):
+            if feature.type == 'Helix':
+                feature_type = r'$\alpha$ helix'
+            elif feature.type == 'DNA binding':
+                feature_type = r'DNA-binding domain'
+            else:
+                feature_type = feature.type
+
             ax.annotate(
-                s=feature.type,
+                s=feature_type,
                 xy=(start + (end - start) / 2, 0),
                 color='w',
                 ha='center',
                 va='center',
-                fontsize=14,
-                zorder=TEXT_ZORDER)
+                zorder=ZORDER_MAP.get(feature.type.lower(), 6) + 0.5)
 
-    ax.set_xticks(sorted(set(xticks)))
-    ax.set_xticklabels(sorted(set(xticks)), fontsize=9)
+    ax.set_xticks(sorted(set(xticks + [77])))
+    ax.set_xticklabels([_ + 1 for _ in sorted(set(xticks + [77]))])
     ax.set_xlim(x_min, x_max)
     ax.set_ylim(-0.75, 0.75)
 
