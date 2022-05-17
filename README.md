@@ -1,11 +1,11 @@
 ## Genome Diagram
 
-As lightweight Python 3 graphing API for genomic intervals and genomic features.
+A lightweight Python 3 graphing API for genomic intervals and genomic features.
 
 ```python
 import numpy as np
 import genome_browser as gb
-n = 105  # Length of randoim genomic interval.
+n = 105  # Length of random genomic interval.
 
 g = gb.GenomeDiagram()
 
@@ -27,7 +27,7 @@ for _ in range(9):
                        np.random.choice(['#E74C3C', '#3498DB', '0.2'])])
 g.add_track(track)
 
-# Annotate the figure with interval specific metadata. Will always appear in lower-left
+# Annotate the figure with interval specific metadata. Will always appear in lower-right
 g.annotation = '{}:{:,}-{:,}'.format('chr3', 20000, 812383)
 
 fig, axes = g.draw()
