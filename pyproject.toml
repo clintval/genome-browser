@@ -6,9 +6,10 @@ authors = ["Clint Valentine <valentine.clint@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.7,<3.11"
 matplotlib = "^3.5.2"
 more-itertools = "^8.13.0"
+scipy = "1.7.3"
 
 [tool.poetry.dev-dependencies]
 
