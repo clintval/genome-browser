@@ -8,6 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
 matplotlib = "^3.5.2"
+more-itertools = "^8.13.0"
 
 [tool.poetry.dev-dependencies]
 
