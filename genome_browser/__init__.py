@@ -167,7 +167,7 @@ class GenomeDiagram(object):
                 if self.annotation is not None:
                     ax.annotate(xy=(1, 0),
                                 xycoords='axes fraction',
-                                s=self.annotation,
+                                text=self.annotation,
                                 xytext=(0, -60),
                                 textcoords='offset points',
                                 va='bottom',
