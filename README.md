@@ -3,8 +3,10 @@
 A lightweight Python 3 graphing API for genomic intervals and genomic features.
 
 ```python
+from matplotlib import pyplot as plt
 import numpy as np
 import genome_browser as gb
+
 n = 105  # Length of random genomic interval.
 
 g = gb.GenomeDiagram()
@@ -31,6 +33,7 @@ g.add_track(track)
 g.annotation = '{}:{:,}-{:,}'.format('chr3', 20000, 812383)
 
 fig, axes = g.draw()
+plt.show()
 ```
 
 ![test_interval](https://raw.githubusercontent.com/clintval/genome-browser/master/img/gb_test.png "Test Interval")
