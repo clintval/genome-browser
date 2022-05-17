@@ -3,9 +3,10 @@
 A lightweight Python 3 graphing API for genomic intervals and genomic features.
 
 ```python
->>> import numpy as np
->>> import genome_browser as gb
 >>> from matplotlib import pyplot as plt
+>>> import numpy as np
+
+>>> import genome_browser as gb
 
 >>> n = 105  # Length of random genomic interval.
 
