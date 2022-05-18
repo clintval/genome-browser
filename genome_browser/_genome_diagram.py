@@ -93,7 +93,7 @@ class GenomeDiagram(object):
                     ax.annotate(
                         xy=(1, 0),
                         xycoords='axes fraction',
-                        s=self.annotation,
+                        text=self.annotation,
                         xytext=(0, -60),
                         textcoords='offset points',
                         va='bottom',
@@ -106,7 +106,7 @@ class GenomeDiagram(object):
             # defined using proportional values of the ax's x and y limits.
             if track.annotate is True and track.name is not None:
                 ax.annotate(
-                    s=track.name,
+                    text=track.name,
                     xy=(ax.get_xlim()[0] + abs(np.subtract(*ax.get_xlim())) / 100,
                         ax.get_ylim()[1] / 1.01),
                     va='top',
