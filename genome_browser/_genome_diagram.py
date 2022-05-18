@@ -1,5 +1,5 @@
+from typing import List
 import itertools
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -10,7 +10,7 @@ __all__ = [
 
 
 class GenomeDiagram(object):
-    def __init__(self, targets, name=None):
+    def __init__(self, targets: List[tuple], name: str = None):
         self.targets = [targets] if not isinstance(targets, (list, tuple)) else targets
         self.name = name
 
