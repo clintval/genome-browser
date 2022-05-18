@@ -44,7 +44,7 @@ class GraphTrack(Track):
         self.graphs = []
         self.is_proportional = is_proportional
 
-        self.RESOLUTION = 1e5
+        self.RESOLUTION = np.int(1e5)
 
     @property
     def xlimits(self):
