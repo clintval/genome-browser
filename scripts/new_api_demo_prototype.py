@@ -5,31 +5,30 @@ import genome_browser as gb
 
 n = 105  # Length of random genomic interval.
 
+g = gb.GenomeDiagram()
+
 # Plot a density of random data, interpolated and filled.
-track1 = gb.GraphTrack("Random Density")
-track1.add_graph(
+graph_track = gb.GraphTrack("Random Density")
+graph_track.add_graph(
     gb.Graph(x=np.arange(n), y=np.abs(np.random.randn(n)), fmt="interpolate", fill=True)
 )
+g.add_track(graph_track)
 
 # Plot 9 random interval features (random start, length, orientation, and color).
-track2 = gb.GraphTrack("Random Intervals", height_ratio=0.4)
-genomic_intervals = []
+interval_track = gb.IntervalTrack("Random Intervals", height_ratio=0.4)
 for _ in range(9):
     # Feature must follow iterable as (position, width, strand, color)
-    genomic_intervals.append(
-        gb.Interval(
-            chrom="chr3",
-            start=np.random.randint(0, 20),
-            end=np.random.randint(20, n - 15),
-            strand=np.random.choice(["+", "-", "."]),
-            metadata={"color": np.random.choice(["#E74C3C", "#3498DB", "0.2"])},
-        )
+    interval = gb.Interval(
+        chrom="chr3",
+        start=np.random.randint(0, n),
+        end=np.random.randint(0, n),
+        strand=np.random.choice(["+", "-", "."]),
+        color=np.random.choice(["#E74C3C", "#3498DB", "0.2"]),
     )
+    interval_track.add_interval(interval)
 
-g = gb.GenomeDiagram(genomic_intervals)
 
-g.add_track(track1)
-g.add_track(track2)
+g.add_track(interval_track)
 
 # Annotate the figure with interval specific metadata. Will always appear in lower-right
 g.annotation = "{}:{:,}-{:,}".format("chr3", 20000, 812383)

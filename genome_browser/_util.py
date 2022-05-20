@@ -40,7 +40,7 @@ def disjoint_bins(intervals):
     ----------
     intervals : iterable
         Can be a list of (float, float) tuples or a list of interval classes
-        with 'start' and 'stop' attributes such as a BedTool interval or a VCF
+        with 'start' and 'end' attributes such as a BedTool interval or a VCF
         Record class. Tuple-style intervals and class intervals can be mixed.
 
     Returns

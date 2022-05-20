@@ -130,7 +130,7 @@ class IntervalTrack(Track):
 
     @property
     def is_empty(self):
-        return len(self.intervals) == 0
+        return not self.intervals
 
     @property
     def xlimits(self):

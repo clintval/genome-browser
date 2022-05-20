@@ -1,4 +1,3 @@
-from typing import List
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,11 +9,11 @@ __all__ = [
 
 
 class GenomeDiagram(object):
-    def __init__(self, targets: List[tuple], name: str = None):
-        self.targets = [targets] if not isinstance(targets, (list, tuple)) else targets
+    def __init__(self, name=""):
         self.name = name
+        self.annotation = ""
 
-        self.annotation = None
+        self.targets = []
         self.tracks = []
 
         self.ASPECT = 2.8
@@ -35,6 +34,9 @@ class GenomeDiagram(object):
 
         return min(flat), max(flat)
 
+    def add_target(self, target):
+        target and self.targets.append(target)
+
     def add_track(self, track, add_if_empty=True):
         if track.is_empty and not add_if_empty:
             return None
@@ -48,7 +50,7 @@ class GenomeDiagram(object):
         # tweaked post-draw.
         fig, axes = plt.subplots(
             nrows=len(self.tracks),
-            ncols=len(self.targets),
+            ncols=len(self.targets) if self.targets else 1,
             figsize=(20, len(self.tracks) * 0.75 * self.ASPECT),
             gridspec_kw={
                 'height_ratios': self.height_ratios,
@@ -89,17 +91,16 @@ class GenomeDiagram(object):
                 # Figure annotations will be applied to the last ax in offset
                 # coordinates in a lightgray text. Clipping is ignored as the
                 # text clearly cips with the axes outboard frame.
-                if self.annotation is not None:
-                    ax.annotate(
-                        xy=(1, 0),
-                        xycoords='axes fraction',
-                        text=self.annotation,
-                        xytext=(0, -60),
-                        textcoords='offset points',
-                        va='bottom',
-                        ha='right',
-                        color='0.6',
-                        clip_on=False)
+                ax.annotate(
+                    xy=(1, 0),
+                    xycoords='axes fraction',
+                    text=self.annotation,
+                    xytext=(0, -60),
+                    textcoords='offset points',
+                    va='bottom',
+                    ha='right',
+                    color='0.6',
+                    clip_on=False)
 
             # Provide simple logic for plotting a track annotation in the
             # top left of each track. The position will remain constant as its
