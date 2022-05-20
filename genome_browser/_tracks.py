@@ -155,7 +155,7 @@ class IntervalTrack(Track):
 
         # The non-overlapping disjoint intervals are computed using the
         # logic which priortizes first position of interval, then length.
-        levels = list(disjoint_bins(self.intervals))
+        levels = list(disjoint_bins(self.interval_pretty_sort))
 
         # pull_back is the distance in units to pull back corners for
         # directional intervals
