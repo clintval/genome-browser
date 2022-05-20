@@ -15,7 +15,7 @@ graph_track.add_graph(
 g.add_track(graph_track)
 
 # Plot 9 random interval features (random start, length, orientation, and color).
-interval_track = gb.IntervalTrack("Random Intervals", height_ratio=0.4)
+interval_track = gb.IntervalTrack("Random Intervals", height_ratio=0.4, step=50)
 for _ in range(9):
     # Feature must follow iterable as (position, width, strand, color)
     interval = gb.Interval(
