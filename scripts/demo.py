@@ -25,8 +25,6 @@ for _ in range(9):
         color=np.random.choice(["#E74C3C", "#3498DB", "0.2"]),
     )
     interval_track.add_interval(interval)
-
-
 g.add_track(interval_track)
 
 # Annotate the figure with interval specific metadata. Will always appear in lower-right
