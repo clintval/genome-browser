@@ -16,7 +16,7 @@ __all__ = [
 
 
 class Track(object):
-    def __init__(self, name=None, height_ratio=1, step=500):
+    def __init__(self, name="", height_ratio=1, step=500):
         self.annotate = True
         self.height_ratio = height_ratio
         self.name = name
@@ -30,7 +30,7 @@ class Track(object):
 
 
 class FeatureTrack(Track):
-    def __init__(self, name, height_ratio=1, step=500):
+    def __init__(self, name="", height_ratio=1, step=500):
         Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.features = []
 
@@ -39,7 +39,7 @@ class FeatureTrack(Track):
 
 
 class GraphTrack(Track):
-    def __init__(self, name=None, height_ratio=1, is_proportional=False, step=500):
+    def __init__(self, name="", height_ratio=1, is_proportional=False, step=500):
         Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.graphs = []
         self.is_proportional = is_proportional
@@ -108,7 +108,7 @@ class GraphTrack(Track):
 
 
 class IntervalTrack(Track):
-    def __init__(self, name=None, height_ratio=1, step=500):
+    def __init__(self, name="", height_ratio=1, step=500):
         Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.intervals = []
         self.pullback = 1

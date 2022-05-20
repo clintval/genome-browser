@@ -32,7 +32,7 @@ class Interval(object):
         start,
         end,
         strand='.',
-        name=None,
+        name='',
         **metadata
     ):
         assert isinstance(start, int), 'Loci must be integers'

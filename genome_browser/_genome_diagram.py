@@ -57,7 +57,7 @@ class GenomeDiagram(object):
                 'hspace': self.HSPACE,
                 'wspace': 0.0})
 
-        if self.name is not None:
+        if self.name:
             fig.suptitle(self.name, x=0.5, y=0.94, fontsize=24)
 
         axes = np.array([axes]) if len(self.tracks) == 1 else axes
@@ -90,22 +90,22 @@ class GenomeDiagram(object):
 
                 # Figure annotations will be applied to the last ax in offset
                 # coordinates in a lightgray text. Clipping is ignored as the
-                # text clearly cips with the axes outboard frame.
+                # text clearly clips with the axes outboard frame.
                 ax.annotate(
                     xy=(1, 0),
                     xycoords='axes fraction',
                     text=self.annotation,
                     xytext=(0, -60),
                     textcoords='offset points',
-                    va='bottom',
-                    ha='right',
+                    va='top',
+                    ha='left',
                     color='0.6',
                     clip_on=False)
 
             # Provide simple logic for plotting a track annotation in the
             # top left of each track. The position will remain constant as its
             # defined using proportional values of the ax's x and y limits.
-            if track.annotate is True and track.name is not None:
+            if track.annotate and track.name:
                 ax.annotate(
                     text=track.name,
                     xy=(ax.get_xlim()[0] + abs(np.subtract(*ax.get_xlim())) / 100,
