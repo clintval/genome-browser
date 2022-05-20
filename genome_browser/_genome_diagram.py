@@ -95,10 +95,10 @@ class GenomeDiagram(object):
                     xy=(1, 0),
                     xycoords='axes fraction',
                     text=self.annotation,
-                    xytext=(0, -60),
+                    xytext=(0, -22.5),
                     textcoords='offset points',
                     va='top',
-                    ha='left',
+                    ha='right',
                     color='0.6',
                     clip_on=False)
 
