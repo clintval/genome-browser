@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "genome-browser"
+version = "0.1.1"
+description = "A lightweight Python 3 graphing API for genomic graphs over genomic intervals."
+authors = ["Clint Valentine <valentine.clint@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.11"
+matplotlib = "^3.5.2"
+requests = "^2.27.1"
+palettable = "^3.3.0"
+scipy = "^1.7.3"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,8 +1,3 @@
-## Genome Diagram
-
-A lightweight Python 3 graphing API for genomic graphs over genomic intervals.
-
-```python
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -37,12 +32,3 @@ g.annotation = "{}:{:,}-{:,}".format("chr3", 20000, 812383)
 
 fig, axes = g.draw()
 plt.show()
-```
-
-![test_interval](https://raw.githubusercontent.com/clintval/genome-browser/master/img/gb_test.png "Test Interval")
-
-The above can also be run from the terminal:
-
-```
-python -m scripts.demo
-```

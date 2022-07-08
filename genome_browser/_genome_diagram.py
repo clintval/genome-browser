@@ -1,5 +1,4 @@
 import itertools
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -10,11 +9,11 @@ __all__ = [
 
 
 class GenomeDiagram(object):
-    def __init__(self, targets, name=None):
-        self.targets = [targets] if not isinstance(targets, (list, tuple)) else targets
+    def __init__(self, name=""):
         self.name = name
+        self.annotation = ""
 
-        self.annotation = None
+        self.targets = []
         self.tracks = []
 
         self.ASPECT = 2.8
@@ -35,6 +34,9 @@ class GenomeDiagram(object):
 
         return min(flat), max(flat)
 
+    def add_target(self, target):
+        target and self.targets.append(target)
+
     def add_track(self, track, add_if_empty=True):
         if track.is_empty and not add_if_empty:
             return None
@@ -48,14 +50,14 @@ class GenomeDiagram(object):
         # tweaked post-draw.
         fig, axes = plt.subplots(
             nrows=len(self.tracks),
-            ncols=len(self.targets),
+            ncols=len(self.targets) if self.targets else 1,
             figsize=(20, len(self.tracks) * 0.75 * self.ASPECT),
             gridspec_kw={
                 'height_ratios': self.height_ratios,
                 'hspace': self.HSPACE,
                 'wspace': 0.0})
 
-        if self.name is not None:
+        if self.name:
             fig.suptitle(self.name, x=0.5, y=0.94, fontsize=24)
 
         axes = np.array([axes]) if len(self.tracks) == 1 else axes
@@ -88,25 +90,24 @@ class GenomeDiagram(object):
 
                 # Figure annotations will be applied to the last ax in offset
                 # coordinates in a lightgray text. Clipping is ignored as the
-                # text clearly cips with the axes outboard frame.
-                if self.annotation is not None:
-                    ax.annotate(
-                        xy=(1, 0),
-                        xycoords='axes fraction',
-                        s=self.annotation,
-                        xytext=(0, -60),
-                        textcoords='offset points',
-                        va='bottom',
-                        ha='right',
-                        color='0.6',
-                        clip_on=False)
+                # text clearly clips with the axes outboard frame.
+                ax.annotate(
+                    xy=(1, 0),
+                    xycoords='axes fraction',
+                    text=self.annotation,
+                    xytext=(0, -22.5),
+                    textcoords='offset points',
+                    va='top',
+                    ha='right',
+                    color='0.6',
+                    clip_on=False)
 
             # Provide simple logic for plotting a track annotation in the
             # top left of each track. The position will remain constant as its
             # defined using proportional values of the ax's x and y limits.
-            if track.annotate is True and track.name is not None:
+            if track.annotate and track.name:
                 ax.annotate(
-                    s=track.name,
+                    text=track.name,
                     xy=(ax.get_xlim()[0] + abs(np.subtract(*ax.get_xlim())) / 100,
                         ax.get_ylim()[1] / 1.01),
                     va='top',

@@ -32,17 +32,16 @@ class Interval(object):
         start,
         end,
         strand='.',
-        name=None,
+        name='',
         **metadata
     ):
         assert isinstance(start, int), 'Loci must be integers'
         assert isinstance(end, int), 'Loci must be integers'
-        assert end - start > 0, 'Exclusive end must be greater than start'
         assert strand in ('.', '+', '-'), 'Strand must be ".", "+", "-" only'
 
         self.chrom = str(chrom)
-        self.start = start
-        self.end = end
+        self.start = min(start, end)
+        self.end = max(start, end)
         self.strand = strand
         self.name = name
         self.metadata = metadata

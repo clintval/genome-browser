@@ -16,11 +16,11 @@ __all__ = [
 
 
 class Track(object):
-    def __init__(self, name=None, height_ratio=1):
+    def __init__(self, name="", height_ratio=1, step=500):
         self.annotate = True
         self.height_ratio = height_ratio
         self.name = name
-        self.step = 500
+        self.step = step
 
         self.ALPHA = 0.9
         self.PADDING = 0.3
@@ -30,8 +30,8 @@ class Track(object):
 
 
 class FeatureTrack(Track):
-    def __init__(self, name, height_ratio=1):
-        Track.__init__(self, name, height_ratio=height_ratio)
+    def __init__(self, name="", height_ratio=1, step=500):
+        Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.features = []
 
     def add_feature(self, feature):
@@ -39,12 +39,12 @@ class FeatureTrack(Track):
 
 
 class GraphTrack(Track):
-    def __init__(self, name=None, height_ratio=1, is_proportional=False):
-        Track.__init__(self, name, height_ratio=height_ratio)
+    def __init__(self, name="", height_ratio=1, is_proportional=False, step=500):
+        Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.graphs = []
         self.is_proportional = is_proportional
 
-        self.RESOLUTION = 1e5
+        self.RESOLUTION = np.int(1e5)
 
     @property
     def xlimits(self):
@@ -108,8 +108,8 @@ class GraphTrack(Track):
 
 
 class IntervalTrack(Track):
-    def __init__(self, name=None, height_ratio=1):
-        Track.__init__(self, name, height_ratio=height_ratio)
+    def __init__(self, name="", height_ratio=1, step=500):
+        Track.__init__(self, name, height_ratio=height_ratio, step=step)
         self.intervals = []
         self.pullback = 1
 
@@ -130,7 +130,7 @@ class IntervalTrack(Track):
 
     @property
     def is_empty(self):
-        return len(self.intervals) == 0
+        return not self.intervals
 
     @property
     def xlimits(self):
@@ -155,7 +155,7 @@ class IntervalTrack(Track):
 
         # The non-overlapping disjoint intervals are computed using the
         # logic which priortizes first position of interval, then length.
-        levels = list(disjoint_bins(self.intervals))
+        levels = list(disjoint_bins(self.interval_pretty_sort))
 
         # pull_back is the distance in units to pull back corners for
         # directional intervals
